@@ -15,8 +15,14 @@ require 'signalwire/webhook/validate_request'
 module Signalwire
   module Sdk
     class << self
+      attr_accessor :configuration
+
       def configuration
         @configuration ||= Configuration.new
+      end
+
+      def reset
+        @configuration = Configuration.new
       end
 
       def configure
