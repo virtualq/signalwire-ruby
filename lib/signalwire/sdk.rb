@@ -10,12 +10,19 @@ require 'signalwire/sdk/voice_response'
 require 'signalwire/sdk/fax_response'
 require 'signalwire/sdk/messaging_response'
 require 'signalwire/rest/client'
+require 'signalwire/webhook/validate_request'
 
 module Signalwire
   module Sdk
     class << self
+      attr_accessor :configuration
+
       def configuration
         @configuration ||= Configuration.new
+      end
+
+      def reset
+        @configuration = Configuration.new
       end
 
       def configure
