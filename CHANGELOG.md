@@ -5,11 +5,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
  ## [Unreleased]
 
-## [2.5.0] - 2023-
+## [2.6.0] -
 ### Added
-- Add Capability to indicate the Service Provider (Signalwire or Twilio)
+- Remove support for Ruby 2.6
+- Add support for Ruby 3.3
 
-## [2.4.0] - 2023-
+## [2.5.0] - 2023-10-26
+### Added
+- Add Middleware `SignalwireWebhookAuthentication`
+
+## [2.4.0] - 2023-10-13
 ### Added
 - Add Webhook `ValidateRequest`
 
