@@ -24,7 +24,7 @@ The Ruby SDK is a gem built from the [signalwire-ruby](https://github.com/signal
 
 1. Install Ruby, Bundler and Rubygems. [RVM](https://rvm.io/) is an easy to use Ruby installer and environment manager.
 2. Fork the [signalwire-ruby](https://github.com/signalwire/signalwire-ruby) repository and clone it.
-3. Create a new branch from `master` for your change.
+3. Create a new branch from `main` for your change.
 4. Run `bundle install` to install global dependencies.
 5. Run `bundle exec guard -c` to start watching your files and specs.
 6. Make changes!
