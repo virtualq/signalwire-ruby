@@ -11,7 +11,7 @@ module Signalwire::REST
       service_provider = args.delete(:service_provider)
       api_host = args.delete(:api_host)
 
-      @api_host = api_host if api_host.is_a?(String) && !api_host.strip.empty?
+      @api_host = api_host.strip if api_host.is_a?(String) && !api_host.strip.empty?
 
       Signalwire::Sdk.configure do |config|
         config.hostname = host if host
