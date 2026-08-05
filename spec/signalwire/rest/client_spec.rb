@@ -100,7 +100,7 @@ module Signalwire
       # on a client that leaves both alone. These pin that boundary: the caller
       # has to know about it, because every failure here looks like bad DNS.
       describe 'interaction with edge and region' do
-        def requested_host(api_host:, edge: nil, region: nil)
+        def expect_request_to(host, api_host:, edge: nil, region: nil)
           client = Signalwire::REST::Client.new 'AC123', 'TOKEN',
                                                 service_provider: 'twilio',
                                                 api_host: api_host
@@ -111,23 +111,26 @@ module Signalwire
                                            headers: { 'Content-Type' => 'application/json' })
           client.api.accounts('AC123').fetch
 
-          URI(WebMock::RequestRegistry.instance.requested_signatures.hash.keys.last.uri.to_s).host
+          expect(a_request(:any, %r{\Ahttps://#{Regexp.escape(host)}/})).to have_been_made
         end
 
         it 'reaches the overridden host untouched when neither is set' do
-          expect(requested_host(api_host: 'simulator.example.com')).to eq('simulator.example.com')
+          expect_request_to 'simulator.example.com', api_host: 'simulator.example.com'
         end
 
         it 'has edge and region spliced into the overridden host' do
-          expect(requested_host(api_host: 'simulator.example.com', edge: 'frankfurt', region: 'us1'))
-            .to eq('simulator.frankfurt.us1.example.com')
+          expect_request_to 'simulator.frankfurt.us1.example.com',
+                            api_host: 'simulator.example.com', edge: 'frankfurt', region: 'us1'
         end
 
-        it 'drops the middle labels of a longer overridden host' do
-          expect(requested_host(api_host: 'sim.internal.example.com', edge: 'frankfurt', region: 'us1'))
-            .to eq('sim.frankfurt.us1.example.com')
-          expect(requested_host(api_host: 'dc.sim.internal.example.com', edge: 'frankfurt', region: 'us1'))
-            .to eq('dc.frankfurt.us1.example.com')
+        it 'drops the middle label of a four-label overridden host' do
+          expect_request_to 'sim.frankfurt.us1.example.com',
+                            api_host: 'sim.internal.example.com', edge: 'frankfurt', region: 'us1'
+        end
+
+        it 'drops both middle labels of a five-label overridden host' do
+          expect_request_to 'dc.frankfurt.us1.example.com',
+                            api_host: 'dc.sim.internal.example.com', edge: 'frankfurt', region: 'us1'
         end
       end
     end
