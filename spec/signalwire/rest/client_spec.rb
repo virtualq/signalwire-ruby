@@ -94,6 +94,42 @@ module Signalwire
 
         expect(client.api.hostname).to eq('simulator.example.com')
       end
+
+      # Twilio::REST::Client#build_uri splices edge and region into the request
+      # host whenever either is set, so the override only reaches the wire intact
+      # on a client that leaves both alone. These pin that boundary: the caller
+      # has to know about it, because every failure here looks like bad DNS.
+      describe 'interaction with edge and region' do
+        def requested_host(api_host:, edge: nil, region: nil)
+          client = Signalwire::REST::Client.new 'AC123', 'TOKEN',
+                                                service_provider: 'twilio',
+                                                api_host: api_host
+          client.edge = edge
+          client.region = region
+
+          stub_request(:any, //).to_return(status: 200, body: '{}',
+                                           headers: { 'Content-Type' => 'application/json' })
+          client.api.accounts('AC123').fetch
+
+          URI(WebMock::RequestRegistry.instance.requested_signatures.hash.keys.last.uri.to_s).host
+        end
+
+        it 'reaches the overridden host untouched when neither is set' do
+          expect(requested_host(api_host: 'simulator.example.com')).to eq('simulator.example.com')
+        end
+
+        it 'has edge and region spliced into the overridden host' do
+          expect(requested_host(api_host: 'simulator.example.com', edge: 'frankfurt', region: 'us1'))
+            .to eq('simulator.frankfurt.us1.example.com')
+        end
+
+        it 'drops the middle labels of a longer overridden host' do
+          expect(requested_host(api_host: 'sim.internal.example.com', edge: 'frankfurt', region: 'us1'))
+            .to eq('sim.frankfurt.us1.example.com')
+          expect(requested_host(api_host: 'dc.sim.internal.example.com', edge: 'frankfurt', region: 'us1'))
+            .to eq('dc.frankfurt.us1.example.com')
+        end
+      end
     end
 
     describe 'without api_host:' do
