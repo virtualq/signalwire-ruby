@@ -6,7 +6,12 @@ module Twilio
       def initialize(twilio)
         super
 
-        @host = if Signalwire::Sdk.configuration.service_provider == 'twilio'
+        override = twilio.respond_to?(:api_host) ? twilio.api_host : nil
+        override = nil unless override.is_a?(String) && !override.strip.empty?
+
+        @host = if override
+                  override
+                elsif Signalwire::Sdk.configuration.service_provider == 'twilio'
                   'api.twilio.com'
                 else
                   ENV['SIGNALWIRE_HOST'] || ENV['SIGNALWIRE_API_HOSTNAME'] || Signalwire::Sdk.configuration.hostname ||
