@@ -1,8 +1,7 @@
-FROM ruby:latest
+FROM ruby:4.0.9@sha256:127b7bfab0d522244d37e5e62694fc2358928818e4d0953a67e03ab756fbf443
 
 COPY . /app
 WORKDIR /app
 
-RUN bundle install
-CMD ["bundle", "exec", "rspec"]
-
+RUN gem install bundler --version 2.6.7 --no-document && bundle _2.6.7_ install
+CMD ["bundle", "_2.6.7_", "exec", "rspec"]
